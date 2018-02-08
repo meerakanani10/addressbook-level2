@@ -52,6 +52,16 @@ public class StorageFile {
         }
     }
 
+    /**
+     * Signals that the some error has occured when trying to write to the storage file
+     * This error could be due to the fact that the file is in read-only mode
+      */
+    public static class StorageOperationReadOnlyException extends Exception {
+        public StorageOperationReadOnlyException(String message) {
+            super(message);
+        }
+    }
+
     private final JAXBContext jaxbContext;
 
     public final Path path;
@@ -92,7 +102,7 @@ public class StorageFile {
      *
      * @throws StorageOperationException if there were errors converting and/or storing data to file.
      */
-    public void save(AddressBook addressBook) throws StorageOperationException {
+    public void save(AddressBook addressBook) throws StorageOperationException, StorageOperationReadOnlyException {
 
         /* Note: Note the 'try with resource' statement below.
          * More info: https://docs.oracle.com/javase/tutorial/essential/exceptions/tryResourceClose.html
@@ -106,7 +116,8 @@ public class StorageFile {
             marshaller.marshal(toSave, fileWriter);
 
         } catch (IOException ioe) {
-            throw new StorageOperationException("Error writing to file: " + path);
+            throw new StorageOperationReadOnlyException("Error writing to file:" + path +
+                    "\nPlease check that the file is not in read-only mode");
         } catch (JAXBException jaxbe) {
             throw new StorageOperationException("Error converting address book into storage format");
         }
