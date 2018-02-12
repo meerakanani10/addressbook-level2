@@ -113,6 +113,7 @@ Examples:
 
 ### Clearing all entries : `clear`
 Clears all entries from the address book.<br>
+Will list out the entries in the address during a clear for the users reference. <br>
 Format: `clear`  
 
 #### Exiting the program : `exit`
