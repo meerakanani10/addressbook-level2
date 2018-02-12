@@ -1,10 +1,6 @@
 package seedu.addressbook.commands;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import seedu.addressbook.data.person.ReadOnlyPerson;
 
@@ -48,13 +44,31 @@ public class FindCommand extends Command {
      */
     private List<ReadOnlyPerson> getPersonsWithNameContainingAnyKeyword(Set<String> keywords) {
         final List<ReadOnlyPerson> matchedPersons = new ArrayList<>();
+        List<String> nameSplitByWhiteSpace = new ArrayList<>();
+        ArrayList<String> lowerCaseNames = new ArrayList<>();
+        Set<String> loweredKeywords = new HashSet<>();
         for (ReadOnlyPerson person : addressBook.getAllPersons()) {
-            final Set<String> wordsInName = new HashSet<>(person.getName().getWordsInName());
-            if (!Collections.disjoint(wordsInName, keywords)) {
+            nameSplitByWhiteSpace = person.getName().getWordsInName();
+            for (String split : nameSplitByWhiteSpace) {
+                lowerCaseNames.add(makeLowerCase(split));
+            }
+            final Set<String> wordsInName = new HashSet<>(lowerCaseNames);
+            for (String keyword : keywords) {
+                loweredKeywords.add(makeLowerCase(keyword));
+            }
+            if (!Collections.disjoint(lowerCaseNames, loweredKeywords)) {
                 matchedPersons.add(person);
+                lowerCaseNames.clear();
             }
         }
         return matchedPersons;
     }
 
+    private static ArrayList<String> splitByWhitespace(String toSplit) {
+        return new ArrayList<>(Arrays.asList(toSplit.trim().split("\\s+")));
+    }
+
+    private static String makeLowerCase(String partOfName) {
+        return partOfName.toLowerCase();
+    }
 }
